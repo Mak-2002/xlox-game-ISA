@@ -1,10 +1,11 @@
 import copy
+from TerminalStyling import *
 
 class Maze:
     """
     Represents a maze (state).
     """
-    def __init__(self, maze_data) -> None:
+    def __init__(self, maze_data, previous_maze=None) -> None:
 
         #? Before we create the maze, we should validate that maze_data is a two-dimensional array
         if not isinstance(maze_data, list):
@@ -20,9 +21,15 @@ class Maze:
             for column, cell in enumerate(rowList):
                 if cell == 'W':
                     self.white_cells.add((row, column))
+        self.previous_maze = previous_maze
+
+    def grid_tuple(self, grid) -> tuple:
+        return tuple(map(tuple, grid))
 
     def __hash__(self) -> int:
-        return hash(tuple(map(tuple, self.grid)))
+        return hash(tuple(
+            self.grid_tuple(self.grid), 
+            self.grid_tuple(self.previous_maze.grid)))
     
     def __eq__(self, other: 'Maze') -> bool:
         return isinstance(other, Maze) and hash(self) == hash(other)
@@ -66,8 +73,10 @@ class Maze:
         if not self.check_move_validity(row, column):
             return None
         
-        newMaze = copy.copy(self)
-        newMaze.inverse_cell_color(row, column)
+        # new_maze = copy.copy(self)
+        new_maze = Maze(self.grid, self)
+
+        new_maze.inverse_cell_color(row, column)
         indices_changes = {
             (-1, 0),
             (+1, 0),
@@ -75,9 +84,9 @@ class Maze:
             (0, +1),
         }
         for change in indices_changes:
-            newMaze.inverse_cell_color(row+change[0], column+change[1])
+            new_maze.inverse_cell_color(row+change[0], column+change[1])
 
-        return newMaze    
+        return new_maze    
     
     def inverse_cell_color(self, row, column) -> None:
         try:
