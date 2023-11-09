@@ -72,7 +72,7 @@ class State:
         except IndexError:
             return False
 
-    def apply_move(self, row, column) -> 'State':
+    def apply_move(self, row, column):
         """
         Applies a move to the maze and returns the resulting maze state.
 
@@ -141,7 +141,7 @@ class State:
         }
         return cell_state_descriptions[self.grid[row][column]]
 
-    def get_possible_next_states(self) -> set['State']:
+    def get_possible_next_states(self):
         """
         Returns a set of possible next maze states by making valid moves on white cells.
 

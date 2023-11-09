@@ -29,11 +29,11 @@ class Game:
 
         while True:
             try:
-                input_value = input(grey_color + 'Choose a level from 1 to 4, or q to quit\n')
+                input_value = input(grey_color + 'Choose a level from 1 to 7, or q to quit\n')
                 if input_value == 'q':
                     return
                 level = int(input_value) - 1
-                if level < 0 or level > 3:
+                if level < 0 or level > 6:
                     raise Exception
                 print()
                 game = Game(starting_maze_data=initial_mazes[level])
@@ -55,8 +55,10 @@ class Game:
     def find_path(self, node : 'Node') -> list['Node']:
         node = copy.deepcopy(node)
         path = []
-        while node:
+        while True:
             path.append(node)
+            if not node.parent:
+                break
             node = node.parent
         path.reverse()
         return path
@@ -64,7 +66,7 @@ class Game:
     def solution_stats(self, node : 'Node', iters : int, print_solution : bool = False):
         stats_str = ""
         stats_str += green_color + 'Solution found!\n' + blue_color
-        stats_str += f"Visited nodes: {iters} node\n"
+        stats_str += f"Visited nodes: {iters} nodes\n"
         stats_str += f"Solution depth: {node.depth} moves\n"
         if print_solution:
             solution = self.find_path(node)
@@ -122,16 +124,17 @@ class Game:
             if current_node.state.is_final():
                 print(blue_color + 'UCS: ' + self.solution_stats(current_node, iters, print_solution))
                 break
-            current_state_str = str(current_node.state)     
-            # if current_state_str not in visited:
-            #     visited.add(current_state_str)
-            #     for node in current_node.get_possible_next_nodes():
-            #         priority_queue.append(node)
-            visited.add(current_state_str)
+            
+            visited.add(str(current_node.state))
             for node in current_node.get_possible_next_nodes():
                 if str(node.state) not in visited:
-                    node_search_res_in_pq = list(filter(lambda item: item.state == node.state, opened_nodes_pq))
+                    heapq.heappush(opened_nodes_pq, node)
                     
+        # !Important: 
+        # UCS is a greedy algorithm, meaning that whenever a node is reached,
+        # it is guaranteed to have been reached with the least cost. Therefore, there is
+        # no need to check whether it is reachable with a lower cost when we try to
+        # reach it again.
 
 
     def paly_in_computer_mode(self, print_solution : bool = False):
@@ -139,8 +142,8 @@ class Game:
         self.dfs(print_solution)
         print('\n')
         self.bfs(print_solution)
-        # FUTURE A-star
-
+        print('\n')
+        self.ucs(print_solution)
 
     def play_in_user_mode(self):
         current_node = copy.deepcopy(self.initial_node)
@@ -168,7 +171,7 @@ class Game:
                     newState = current_state.apply_move(row, column)
                     if newState:
                         current_node = Node(newState,
-                                                 current_state,
+                                                 current_node,
                                                  current_node.cost + 1,
                                                  current_node.depth + 1)
                     else:
