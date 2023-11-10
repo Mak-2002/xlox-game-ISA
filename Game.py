@@ -63,6 +63,7 @@ class Game:
         path.reverse()
         return path
 
+
     def solution_stats(self, node : 'Node', iters : int, print_solution : bool = False):
         stats_str = ""
         stats_str += green_color + 'Solution found!\n' + blue_color
@@ -77,7 +78,8 @@ class Game:
                 stats_str += '\n-------------------------------------------\n' 
         return stats_str
 
-    def dfs(self, print_solution : bool = False):
+
+    def dfs(self, print_solution : bool = False): # Deapth first search algorithm
         current_node = copy.deepcopy(self.initial_node)
         iters = 0
         stack = [current_node]
@@ -88,14 +90,13 @@ class Game:
             if current_node.state.is_final():
                 print(blue_color + 'DFS: ' + self.solution_stats(current_node, iters, print_solution))
                 break
-            current_state_str = str(current_node.state)
-            if current_state_str not in visited:
-                visited.add(current_state_str)
-                for node in current_node.get_possible_next_nodes():
-                    stack.append(node)      
+            visited.add(str(current_node.state))
+            for node in current_node.get_possible_next_nodes():
+                if str(node.state) not in visited:
+                    stack.append(node)
 
 
-    def bfs(self, print_solution : bool = False):
+    def bfs(self, print_solution : bool = False): # Breadth first search algorithm
         current_node = copy.deepcopy(self.initial_node)
         iters = 0
         queue = deque([current_node])
@@ -106,10 +107,9 @@ class Game:
             if current_node.state.is_final():
                 print(blue_color + 'BFS: ' + self.solution_stats(current_node, iters, print_solution))
                 break
-            current_state_str = str(current_node.state)
-            if current_state_str not in visited:
-                visited.add(current_state_str)
-                for node in current_node.get_possible_next_nodes():
+            visited.add(str(current_node.state))
+            for node in current_node.get_possible_next_nodes():
+                if str(node.state) not in visited:
                     queue.append(node)
 
 
@@ -130,20 +130,21 @@ class Game:
                 if str(node.state) not in visited:
                     heapq.heappush(opened_nodes_pq, node)
                     
-        # !Important: 
+        # !Important:
         # UCS is a greedy algorithm, meaning that whenever a node is reached,
         # it is guaranteed to have been reached with the least cost. Therefore, there is
         # no need to check whether it is reachable with a lower cost when we try to
         # reach it again.
 
 
-    def paly_in_computer_mode(self, print_solution : bool = False):
+    def play_in_computer_mode(self, print_solution : bool = False):
         print()
         self.dfs(print_solution)
         print('\n')
         self.bfs(print_solution)
         print('\n')
         self.ucs(print_solution)
+
 
     def play_in_user_mode(self):
         current_node = copy.deepcopy(self.initial_node)
@@ -199,7 +200,7 @@ class Game:
                 print_solution = False
             else:
                 raise Exception
-            self.paly_in_computer_mode(print_solution)
+            self.play_in_computer_mode(print_solution)
 
 
 if __name__ == '__main__':
