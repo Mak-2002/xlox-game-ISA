@@ -6,14 +6,10 @@ from Node import Node
 from initial_mazes import initial_mazes
 from TerminalStyling import *
 
+
 # Playing modes
 USER_MODE = 1
 COMPUTER_MODE = 2
-
-# Algorithms
-DFS = 1
-BFS = 2
-A_STAR = 3
 
 
 class Game:
@@ -24,7 +20,7 @@ class Game:
         welcome_str = \
             yellow_color + 'An assignment for the Intelligent Search Algorithms course at university, applying concepts to the XLOX game.\n' + \
             'You can check the rules and play the game at: ' + cyan_color + "https://www.puzzleplayground.com/xlox" + \
-            yellow_color + '\n-------------------------------------------' + reset_color
+            yellow_color + '\n-----------------------------------' + reset_color
 
         print(welcome_str)
 
@@ -35,8 +31,8 @@ class Game:
                 if input_value == 'q':
                     return
                 level = int(input_value) - 1
-                if level < 0 or level > 6:
-                    raise Exception
+                if level not in range(0, 6):
+                    raise ValueError("level must be between 1 and 7")
                 print()
                 game = Game(starting_maze_data=initial_mazes[level])
                 choice = input('u : User mode  ||  c : Computer mode\n')
@@ -76,10 +72,10 @@ class Game:
                 stats_str += cyan_color + '#' + \
                     str(node.depth + 1) + '\n' + reset_color
                 stats_str += str(node.state)
-                stats_str += '\n-------------------------------------------\n'
+                stats_str += '\n-----------------------------------\n'
         return stats_str
 
-    def dfs(self, print_solution: bool = False):  # Deapth first search algorithm
+    def dfs(self, print_solution: bool = False):  # * Deapth first search algorithm
         current_node = copy.deepcopy(self.initial_node)
         iters = 0
         stack = [current_node]
@@ -96,7 +92,7 @@ class Game:
                 if str(node.state) not in visited:
                     stack.append(node)
 
-    def bfs(self, print_solution: bool = False):  # Breadth first search algorithm
+    def bfs(self, print_solution: bool = False):  # * Breadth first search algorithm
         current_node = copy.deepcopy(self.initial_node)
         iters = 0
         queue = deque([current_node])
@@ -113,7 +109,7 @@ class Game:
                 if str(node.state) not in visited:
                     queue.append(node)
 
-    def ucs(self, print_solution: bool = False):  # Uniform cost search algorithm
+    def ucs(self, print_solution: bool = False):  # * Uniform cost search algorithm
         current_node = copy.deepcopy(self.initial_node)
         iters = 0
         opened_nodes_pq = [current_node]
@@ -197,12 +193,9 @@ class Game:
             self.play_in_user_mode()
         else:
             print_solution = input('Do you want to print the solution (y/n): ')
-            if print_solution == 'y':
-                print_solution = True
-            elif print_solution == 'n':
-                print_solution = False
-            else:
-                raise Exception
+            if print_solution not in ['y', 'n']:
+                raise ValueError("print_solution must be 'y' or 'n'")
+            print_solution = (print_solution == 'y')
             self.play_in_computer_mode(print_solution)
 
 
