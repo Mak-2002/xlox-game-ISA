@@ -7,6 +7,7 @@ BLACK = 'B'
 BLOCKED = 'X'
 OUT_OF_BOUNDARIES = 'O'
 
+
 class State:
     def __init__(self, maze_data):
         """
@@ -148,12 +149,14 @@ class State:
         Returns:
             set of State: A set of possible next maze states.
         """
-        return [ self.apply_move(move[0], move[1]) for move in self.white_cells ]
+        return [self.apply_move(move[0], move[1])
+                for move in self.white_cells
+                if self.apply_move(move[0], move[1]) is not None]
 
     def is_final(self) -> bool:
         """
         Checks if the maze is in a final state (no more white cells left).
-    
+
         Returns:
             bool: True if it's a final state, False otherwise.
         """
